@@ -82,9 +82,9 @@ app.post('/api/login', async (req, res) => {
 
   try {
     const [rows] = await pool.query(
-      `SELECT v.*, p.nombre AS puesto_nombre, p.latitud, p.longitud, p.radio_metros
+      `SELECT v.*, o.nombre AS puesto_nombre, o.latitud, o.longitud, o.radio_metros
        FROM vigiladores v
-       JOIN puestos p ON p.id = v.puesto_id
+       JOIN objetivos o ON o.id_objetivo = v.puesto_id
        WHERE v.usuario = ? AND v.activo = 1`,
       [usuario]
     );
@@ -177,9 +177,9 @@ app.post('/api/asistencia', authVigilador, async (req, res) => {
   try {
     // Datos del vigilador y su puesto
     const [vigRows] = await pool.query(
-      `SELECT v.ip_asignada, p.latitud AS p_lat, p.longitud AS p_lon, p.radio_metros
+      `SELECT v.ip_asignada, o.latitud AS p_lat, o.longitud AS p_lon, o.radio_metros
        FROM vigiladores v
-       JOIN puestos p ON p.id = v.puesto_id
+       JOIN objetivos o ON o.id_objetivo = v.puesto_id
        WHERE v.id = ?`,
       [vigilador_id]
     );
@@ -202,7 +202,7 @@ app.post('/api/asistencia', authVigilador, async (req, res) => {
       // Verificar que esa IP no haya puesto ya asistencia de tipo "Entrada" hoy
       const hoy = new Date().toISOString().slice(0, 10);
       const [dupRows] = await pool.query(
-        `SELECT id FROM novedades
+        `SELECT id_novedad FROM novedades
          WHERE ip_dispositivo = ?
            AND tipo_novedad_id = ?
            AND DATE(fecha_hora) = ?
@@ -255,7 +255,7 @@ app.post('/api/asistencia', authVigilador, async (req, res) => {
 app.get('/api/mis-novedades', authVigilador, async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT n.id, tn.nombre AS tipo, n.observaciones,
+      `SELECT n.id_novedad, tn.nombre AS tipo, n.observaciones,
               n.ip_dispositivo, n.distancia_metros,
               DATE_FORMAT(n.fecha_hora, '%d/%m/%Y %H:%i') AS fecha_hora
        FROM novedades n
@@ -297,10 +297,10 @@ app.get('/api/admin/novedades', authAdmin, async (req, res) => {
 
   try {
     const [rows] = await pool.query(
-      `SELECT n.id,
+      `SELECT n.id_novedad,
               CONCAT(v.nombre, ' ', v.apellido) AS vigilador,
               v.usuario,
-              p.nombre AS puesto,
+              o.nombre AS puesto,
               tn.nombre AS tipo_novedad,
               n.observaciones,
               n.ip_dispositivo,
@@ -308,7 +308,7 @@ app.get('/api/admin/novedades', authAdmin, async (req, res) => {
               DATE_FORMAT(n.fecha_hora, '%d/%m/%Y %H:%i:%s') AS fecha_hora
        FROM novedades n
        JOIN vigiladores v  ON v.id  = n.vigilador_id
-       JOIN puestos p      ON p.id  = v.puesto_id
+       JOIN objetivos o    ON o.id  = v.puesto_id
        JOIN tipos_novedad tn ON tn.id = n.tipo_novedad_id
        ${whereClause}
        ORDER BY n.fecha_hora DESC
@@ -327,9 +327,9 @@ app.get('/api/admin/vigiladores', authAdmin, async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT v.id, v.nombre, v.apellido, v.usuario, v.ip_asignada, v.activo,
-              p.nombre AS puesto
+              o.nombre AS puesto
        FROM vigiladores v
-       JOIN puestos p ON p.id = v.puesto_id
+       JOIN objetivos o ON o.id_objetivo = v.puesto_id
        ORDER BY v.apellido, v.nombre`
     );
     res.json(rows);
