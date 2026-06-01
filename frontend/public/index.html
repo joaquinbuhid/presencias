@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AsistenciaSeg</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --negro: #0f0f0f;
+    --blanco: #f5f3ee;
+    --acento: #d4a843;
+    --acento2: #e8c068;
+    --rojo: #c0392b;
+    --verde: #1a7a4a;
+    --gris: #2a2a2a;
+    --gris2: #3d3d3d;
+    --gris3: #888;
+    --texto: #e8e6e0;
+    --texto2: #a8a49c;
+    --borde: rgba(212,168,67,0.2);
+    --r: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--negro);
+    color: var(--texto);
+    min-height: 100vh;
+  }
+
+  h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+
+  /* ── Pantallas ── */
+  .pantalla { display: none; min-height: 100vh; }
+  .pantalla.activa { display: flex; flex-direction: column; }
+
+  /* ── LOGIN ── */
+  #login {
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(212,168,67,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(212,168,67,0.04) 0%, transparent 50%),
+      var(--negro);
+    padding: 2rem 1rem;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--gris);
+    border: 1px solid var(--borde);
+    border-radius: 18px;
+    padding: 2.5rem 2rem;
+  }
+
+  .logo-area {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .logo-icon {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, var(--acento), #b8901e);
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 1rem;
+  }
+
+  .logo-area h1 {
+    font-size: 1.5rem;
+    color: var(--texto);
+    letter-spacing: -0.02em;
+  }
+
+  .logo-area p {
+    font-size: 0.8rem;
+    color: var(--texto2);
+    margin-top: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .login-tabs {
+    display: flex;
+    gap: 0;
+    background: var(--negro);
+    border-radius: 8px;
+    padding: 3px;
+    margin-bottom: 1.5rem;
+  }
+
+  .login-tabs button {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    background: transparent;
+    color: var(--texto2);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+
+  .login-tabs button.activo {
+    background: var(--gris2);
+    color: var(--acento);
+    font-weight: 500;
+  }
+
+  label {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--texto2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    background: var(--negro);
+    border: 1px solid var(--gris2);
+    border-radius: 8px;
+    color: var(--texto);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--acento);
+  }
+
+  select option { background: var(--negro); color: var(--texto); }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  .btn {
+    width: 100%;
+    padding: 0.85rem;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+  }
+
+  .btn-oro {
+    background: linear-gradient(135deg, var(--acento), #b8901e);
+    color: var(--negro);
+  }
+
+  .btn-oro:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-oro:active { transform: scale(0.98); }
+
+  .btn-peligro {
+    background: transparent;
+    border: 1px solid var(--rojo);
+    color: #e87a70;
+  }
+
+  .btn-peligro:hover { background: rgba(192,57,43,0.1); }
+
+  .btn-secundario {
+    background: var(--gris2);
+    color: var(--texto);
+  }
+
+  .btn-secundario:hover { background: var(--gris3); }
+
+  .error-msg {
+    background: rgba(192,57,43,0.15);
+    border: 1px solid rgba(192,57,43,0.3);
+    color: #e87a70;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    display: none;
+  }
+
+  .error-msg.visible { display: block; }
+
+  .ok-msg {
+    background: rgba(26,122,74,0.15);
+    border: 1px solid rgba(26,122,74,0.3);
+    color: #6bcf97;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    display: none;
+  }
+
+  .ok-msg.visible { display: block; }
+
+  /* ── APP VIGILADOR ── */
+  #app { background: var(--negro); }
+
+  .topbar {
+    background: var(--gris);
+    border-bottom: 1px solid var(--borde);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-info h2 {
+    font-size: 1rem;
+    color: var(--acento);
+  }
+
+  .topbar-info p {
+    font-size: 0.78rem;
+    color: var(--texto2);
+    margin-top: 2px;
+  }
+
+  .btn-salir {
+    background: transparent;
+    border: 1px solid var(--gris2);
+    color: var(--texto2);
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .btn-salir:hover { border-color: var(--rojo); color: #e87a70; }
+
+  .app-body {
+    padding: 1.5rem;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--gris);
+    border: 1px solid var(--borde);
+    border-radius: var(--r);
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--texto2);
+    margin-bottom: 1rem;
+  }
+
+  /* Boton principal asistencia */
+  .btn-asistencia {
+    width: 100%;
+    padding: 1.2rem;
+    background: linear-gradient(135deg, var(--acento), #b8901e);
+    border: none;
+    border-radius: 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--negro);
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-bottom: 0.8rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-asistencia:hover { opacity: 0.92; transform: translateY(-2px); }
+  .btn-asistencia:active { transform: scale(0.98); }
+  .btn-asistencia:disabled {
+    background: var(--gris2);
+    color: var(--texto2);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-asistencia .icono { font-size: 1.3rem; }
+
+  /* Estado ubicacion */
+  .ubicacion-estado {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--texto2);
+    padding: 0.5rem 0.8rem;
+    background: var(--negro);
+    border-radius: 6px;
+    margin-bottom: 1rem;
+  }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--gris3);
+    flex-shrink: 0;
+  }
+
+  .dot.ok { background: #4caf50; }
+  .dot.error { background: var(--rojo); }
+  .dot.buscando {
+    background: var(--acento);
+    animation: pulso 1s infinite;
+  }
+
+  @keyframes pulso {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Historial */
+  .historial-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .historial-item:last-child { border-bottom: none; }
+
+  .hist-tipo {
+    background: rgba(212,168,67,0.15);
+    color: var(--acento);
+    border-radius: 6px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .hist-info { flex: 1; }
+  .hist-fecha { font-size: 0.78rem; color: var(--texto2); }
+  .hist-obs { font-size: 0.82rem; color: var(--texto); margin-top: 2px; }
+  .hist-ip { font-size: 0.72rem; color: var(--gris3); font-family: monospace; }
+
+  .vacio { text-align: center; color: var(--texto2); font-size: 0.85rem; padding: 1.5rem 0; }
+
+  /* ── PANEL ADMIN ── */
+  #admin {
+    background: var(--negro);
+    flex-direction: column;
+  }
+
+  .admin-topbar {
+    background: var(--gris);
+    border-bottom: 1px solid var(--borde);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .admin-topbar h1 {
+    font-size: 1.1rem;
+    color: var(--acento);
+  }
+
+  .admin-topbar p { font-size: 0.78rem; color: var(--texto2); }
+
+  .admin-body {
+    padding: 1.5rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* Tarjetas resumen */
+  .resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .res-card {
+    background: var(--gris);
+    border: 1px solid var(--borde);
+    border-radius: var(--r);
+    padding: 1.2rem 1rem;
+    text-align: center;
+  }
+
+  .res-card .num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--acento);
+  }
+
+  .res-card .lbl {
+    font-size: 0.75rem;
+    color: var(--texto2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+
+  /* Filtros */
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+    align-items: flex-end;
+  }
+
+  .filtros > div { display: flex; flex-direction: column; }
+
+  .filtros label {
+    font-size: 0.72rem;
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--texto2);
+  }
+
+  .filtros input,
+  .filtros select {
+    width: auto;
+    min-width: 150px;
+    margin-bottom: 0;
+    padding: 0.55rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .btn-filtrar {
+    background: var(--acento);
+    color: var(--negro);
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: opacity 0.2s;
+  }
+
+  .btn-filtrar:hover { opacity: 0.85; }
+
+  /* Tabla */
+  .tabla-wrap {
+    overflow-x: auto;
+    border-radius: var(--r);
+    border: 1px solid var(--borde);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  thead th {
+    background: var(--gris2);
+    color: var(--texto2);
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: rgba(212,168,67,0.04); }
+
+  tbody td {
+    padding: 0.7rem 1rem;
+    color: var(--texto);
+    vertical-align: middle;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    font-size: 0.72rem;
+    font-weight: 500;
+  }
+
+  .badge-entrada { background: rgba(26,122,74,0.2); color: #6bcf97; }
+  .badge-salida  { background: rgba(192,57,43,0.2); color: #e87a70; }
+  .badge-novedad { background: rgba(212,168,67,0.2); color: var(--acento2); }
+  .badge-ronda   { background: rgba(52,152,219,0.2); color: #7ec8e3; }
+  .badge-emergencia { background: rgba(192,57,43,0.4); color: #ff6b6b; }
+
+  .ip-mono { font-family: monospace; font-size: 0.8rem; color: var(--texto2); }
+  .dist-ok { color: #6bcf97; }
+  .dist-warn { color: var(--acento2); }
+
+  .loading {
+    text-align: center;
+    color: var(--texto2);
+    padding: 2rem;
+    font-size: 0.9rem;
+  }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid var(--gris2);
+    border-top-color: var(--acento);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Progress ubicacion */
+  .progress-wrap {
+    margin: 0.5rem 0;
+    display: none;
+  }
+
+  .progress-wrap.visible { display: block; }
+
+  .progress-bar {
+    height: 3px;
+    background: var(--gris2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--acento);
+    width: 0;
+    transition: width 0.1s linear;
+  }
+
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--texto2);
+    margin-bottom: 0.3rem;
+  }
+
+  @media (max-width: 600px) {
+    .admin-body { padding: 1rem; }
+    .admin-topbar { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     PANTALLA: LOGIN
+═══════════════════════════════════════ -->
+<div id="login" class="pantalla activa">
+  <div class="login-card">
+    <div class="logo-area">
+      <div class="logo-icon">🛡</div>
+      <h1>AsistenciaSeg</h1>
+      <p>Control de asistencia</p>
+    </div>
+
+    <div class="login-tabs">
+      <button class="activo" onclick="setTab('vigilador')">Vigilador</button>
+      <button onclick="setTab('admin')">Administrador</button>
+    </div>
+
+    <div id="error-login" class="error-msg"></div>
+
+    <div id="tab-vigilador">
+      <label>Usuario</label>
+      <input type="text" id="vig-usuario" placeholder="tu.usuario" autocomplete="username">
+      <label>Contraseña</label>
+      <input type="password" id="vig-password" placeholder="••••••••" autocomplete="current-password">
+      <button class="btn btn-oro" onclick="loginVigilador()">Ingresar</button>
+    </div>
+
+    <div id="tab-admin" style="display:none">
+      <label>Usuario admin</label>
+      <input type="text" id="adm-usuario" placeholder="admin">
+      <label>Contraseña</label>
+      <input type="password" id="adm-password" placeholder="••••••••">
+      <button class="btn btn-oro" onclick="loginAdmin()">Ingresar al panel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANTALLA: APP VIGILADOR
+═══════════════════════════════════════ -->
+<div id="app" class="pantalla">
+  <div class="topbar">
+    <div class="topbar-info">
+      <h2 id="vig-nombre">—</h2>
+      <p id="vig-puesto">—</p>
+    </div>
+    <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+  </div>
+
+  <div class="app-body">
+
+    <!-- Registrar novedad -->
+    <div class="card">
+      <div class="card-title">Registrar novedad</div>
+
+      <label>Tipo de novedad</label>
+      <select id="tipo-novedad">
+        <option value="">— Seleccionar —</option>
+      </select>
+
+      <label>Observaciones (opcional)</label>
+      <textarea id="observaciones" placeholder="Ingresá detalles adicionales..."></textarea>
+
+      <!-- Estado de ubicacion -->
+      <div class="ubicacion-estado" id="ubi-estado">
+        <span class="dot" id="ubi-dot"></span>
+        <span id="ubi-texto">La ubicación se tomará al confirmar</span>
+      </div>
+
+      <div class="progress-wrap" id="progress-wrap">
+        <div class="progress-label" id="progress-label">Obteniendo ubicación...</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+
+      <div id="error-asis" class="error-msg"></div>
+      <div id="ok-asis" class="ok-msg"></div>
+
+      <button class="btn-asistencia" id="btn-confirmar" onclick="confirmarAsistencia()">
+        <span class="icono">📍</span>
+        <span id="btn-texto">Confirmar asistencia</span>
+      </button>
+    </div>
+
+    <!-- Historial -->
+    <div class="card">
+      <div class="card-title">Últimas novedades</div>
+      <div id="historial-lista"><div class="vacio">Cargando...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANTALLA: PANEL ADMIN
+═══════════════════════════════════════ -->
+<div id="admin" class="pantalla">
+  <div class="admin-topbar">
+    <div>
+      <h1>Panel de control</h1>
+      <p id="admin-nombre">—</p>
+    </div>
+    <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- Resumen del día -->
+    <div class="resumen-grid" id="resumen-grid">
+      <div class="res-card"><div class="num" id="r-total">—</div><div class="lbl">Novedades hoy</div></div>
+      <div class="res-card"><div class="num" id="r-entradas">—</div><div class="lbl">Entradas</div></div>
+      <div class="res-card"><div class="num" id="r-salidas">—</div><div class="lbl">Salidas</div></div>
+      <div class="res-card"><div class="num" id="r-vigiladores">—</div><div class="lbl">Vigiladores activos</div></div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros">
+      <div>
+        <label>Fecha</label>
+        <input type="date" id="f-fecha">
+      </div>
+      <div>
+        <label>Vigilador</label>
+        <select id="f-vigilador">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div>
+        <label>Tipo</label>
+        <select id="f-tipo">
+          <option value="">Todos los tipos</option>
+        </select>
+      </div>
+      <button class="btn-filtrar" onclick="cargarNovedades()">Filtrar</button>
+    </div>
+
+    <!-- Tabla -->
+    <div class="tabla-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha y hora</th>
+            <th>Vigilador</th>
+            <th>Puesto</th>
+            <th>Tipo</th>
+            <th>IP</th>
+            <th>Distancia</th>
+            <th>Observaciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-body">
+          <tr><td colspan="8" class="loading">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Configuracion ─────────────────────────────────────────────
+const API = ''; // Vacío = mismo dominio. O poner 'https://tu-api.com'
+
+// ── Estado ───────────────────────────────────────────────────
+let token = localStorage.getItem('token') || null;
+let rolActual = localStorage.getItem('rol') || null;
+let datosVigilador = JSON.parse(localStorage.getItem('vigilador') || 'null');
+
+// ── Inicializacion ────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  if (token && rolActual === 'vigilador') {
+    mostrarApp();
+  } else if (token && rolActual === 'admin') {
+    mostrarAdmin();
+  }
+
+  // Fecha por defecto en filtro admin = hoy
+  const hoy = new Date().toISOString().slice(0, 10);
+  const fi = document.getElementById('f-fecha');
+  if (fi) fi.value = hoy;
+});
+
+// ── Tabs login ────────────────────────────────────────────────
+function setTab(tab) {
+  document.getElementById('tab-vigilador').style.display = tab === 'vigilador' ? 'block' : 'none';
+  document.getElementById('tab-admin').style.display     = tab === 'admin'     ? 'block' : 'none';
+  document.querySelectorAll('.login-tabs button').forEach((b, i) => {
+    b.classList.toggle('activo', (tab === 'vigilador' && i === 0) || (tab === 'admin' && i === 1));
+  });
+  ocultarError('error-login');
+}
+
+// ── Helpers UI ────────────────────────────────────────────────
+function mostrarError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function ocultarError(id) {
+  document.getElementById(id).classList.remove('visible');
+}
+
+function mostrarOk(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 4000);
+}
+
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API + path, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+    },
+    ...opts
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error del servidor');
+  return data;
+}
+
+// ── LOGIN VIGILADOR ───────────────────────────────────────────
+async function loginVigilador() {
+  ocultarError('error-login');
+  const usuario  = document.getElementById('vig-usuario').value.trim();
+  const password = document.getElementById('vig-password').value;
+  if (!usuario || !password) return mostrarError('error-login', 'Completá usuario y contraseña');
+
+  try {
+    const data = await apiFetch('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ usuario, password })
+    });
+    token = data.token;
+    localStorage.setItem('token', token);
+    localStorage.setItem('rol', 'vigilador');
+    localStorage.setItem('vigilador', JSON.stringify(data.vigilador));
+    datosVigilador = data.vigilador;
+    mostrarApp();
+  } catch (e) {
+    mostrarError('error-login', e.message);
+  }
+}
+
+// ── LOGIN ADMIN ───────────────────────────────────────────────
+async function loginAdmin() {
+  ocultarError('error-login');
+  const usuario  = document.getElementById('adm-usuario').value.trim();
+  const password = document.getElementById('adm-password').value;
+  if (!usuario || !password) return mostrarError('error-login', 'Completá usuario y contraseña');
+
+  try {
+    const data = await apiFetch('/api/login-admin', {
+      method: 'POST',
+      body: JSON.stringify({ usuario, password })
+    });
+    token = data.token;
+    localStorage.setItem('token', token);
+    localStorage.setItem('rol', 'admin');
+    localStorage.setItem('adminNombre', data.nombre);
+    mostrarAdmin();
+  } catch (e) {
+    mostrarError('error-login', e.message);
+  }
+}
+
+// ── CERRAR SESION ─────────────────────────────────────────────
+function cerrarSesion() {
+  token = null;
+  localStorage.clear();
+  document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+  document.getElementById('login').classList.add('activa');
+  document.getElementById('vig-usuario').value = '';
+  document.getElementById('vig-password').value = '';
+}
+
+// ── MOSTRAR APP VIGILADOR ─────────────────────────────────────
+function mostrarApp() {
+  document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+  document.getElementById('app').classList.add('activa');
+
+  if (datosVigilador) {
+    document.getElementById('vig-nombre').textContent =
+      datosVigilador.nombre + ' ' + datosVigilador.apellido;
+    document.getElementById('vig-puesto').textContent = datosVigilador.puesto;
+  }
+
+  cargarTiposNovedad();
+  cargarHistorial();
+}
+
+// ── TIPOS DE NOVEDAD ──────────────────────────────────────────
+async function cargarTiposNovedad() {
+  try {
+    const tipos = await apiFetch('/api/tipos-novedad');
+    const sel = document.getElementById('tipo-novedad');
+    sel.innerHTML = '<option value="">— Seleccionar —</option>';
+    tipos.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t.id;
+      o.textContent = t.nombre;
+      sel.appendChild(o);
+    });
+  } catch (e) {
+    console.error('Error cargando tipos:', e);
+  }
+}
+
+// ── OBTENER UBICACION ─────────────────────────────────────────
+function obtenerUbicacion(segundos = 5) {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Tu dispositivo no soporta geolocalización'));
+      return;
+    }
+
+    const dot   = document.getElementById('ubi-dot');
+    const texto = document.getElementById('ubi-texto');
+    const wrap  = document.getElementById('progress-wrap');
+    const fill  = document.getElementById('progress-fill');
+    const lbl   = document.getElementById('progress-label');
+
+    dot.className   = 'dot buscando';
+    wrap.classList.add('visible');
+
+    let mejor = null;
+    let elapsed = 0;
+    const intervalo = 100;
+
+    // Progreso visual
+    const timer = setInterval(() => {
+      elapsed += intervalo;
+      const pct = Math.min((elapsed / (segundos * 1000)) * 100, 100);
+      fill.style.width = pct + '%';
+      const restante = Math.max(0, segundos - Math.floor(elapsed / 1000));
+      lbl.textContent = `Mejorando precisión... ${restante}s`;
+    }, intervalo);
+
+    // Tomar lecturas continuas y quedarse con la de mejor precision
+    const watcher = navigator.geolocation.watchPosition(
+      pos => {
+        if (!mejor || pos.coords.accuracy < mejor.coords.accuracy) {
+          mejor = pos;
+          const acc = Math.round(pos.coords.accuracy);
+          texto.textContent = `Precisión: ±${acc}m`;
+        }
+      },
+      err => {
+        clearInterval(timer);
+        navigator.geolocation.clearWatch(watcher);
+        wrap.classList.remove('visible');
+        dot.className = 'dot error';
+        texto.textContent = 'No se pudo obtener la ubicación';
+        reject(new Error('No se pudo obtener la ubicación. Habilitá el GPS.'));
+      },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: (segundos + 5) * 1000 }
+    );
+
+    // Después de N segundos usar la mejor lectura
+    setTimeout(() => {
+      clearInterval(timer);
+      navigator.geolocation.clearWatch(watcher);
+      wrap.classList.remove('visible');
+      fill.style.width = '0';
+
+      if (mejor) {
+        dot.className = 'dot ok';
+        texto.textContent = `Ubicación OK (±${Math.round(mejor.coords.accuracy)}m)`;
+        resolve({ lat: mejor.coords.latitude, lon: mejor.coords.longitude });
+      } else {
+        dot.className = 'dot error';
+        texto.textContent = 'No se pudo obtener la ubicación';
+        reject(new Error('No se pudo obtener la ubicación. Habilitá el GPS.'));
+      }
+    }, segundos * 1000);
+  });
+}
+
+// ── CONFIRMAR ASISTENCIA ──────────────────────────────────────
+async function confirmarAsistencia() {
+  ocultarError('error-asis');
+  document.getElementById('ok-asis').classList.remove('visible');
+
+  const tipo_novedad_id = document.getElementById('tipo-novedad').value;
+  const observaciones   = document.getElementById('observaciones').value.trim();
+
+  if (!tipo_novedad_id)
+    return mostrarError('error-asis', 'Seleccioná el tipo de novedad');
+
+  const btn      = document.getElementById('btn-confirmar');
+  const btnTxt   = document.getElementById('btn-texto');
+  btn.disabled   = true;
+  btnTxt.textContent = 'Obteniendo ubicación...';
+
+  try {
+    // 1. Obtener ubicacion (espera 5 segundos para mayor fiabilidad)
+    const { lat, lon } = await obtenerUbicacion(5);
+
+    btnTxt.textContent = 'Registrando...';
+
+    // 2. Enviar al servidor
+    const resp = await apiFetch('/api/asistencia', {
+      method: 'POST',
+      body: JSON.stringify({
+        tipo_novedad_id: parseInt(tipo_novedad_id),
+        observaciones,
+        latitud:  lat,
+        longitud: lon
+      })
+    });
+
+    mostrarOk('ok-asis', `✓ ${resp.mensaje} (a ${resp.distancia_metros}m del puesto)`);
+    document.getElementById('observaciones').value = '';
+    document.getElementById('tipo-novedad').value  = '';
+    cargarHistorial();
+
+  } catch (e) {
+    mostrarError('error-asis', e.message);
+    document.getElementById('ubi-dot').className = 'dot error';
+  } finally {
+    btn.disabled = false;
+    btnTxt.textContent = 'Confirmar asistencia';
+  }
+}
+
+// ── HISTORIAL ─────────────────────────────────────────────────
+async function cargarHistorial() {
+  const lista = document.getElementById('historial-lista');
+  try {
+    const items = await apiFetch('/api/mis-novedades');
+
+    if (!items.length) {
+      lista.innerHTML = '<div class="vacio">Sin novedades registradas</div>';
+      return;
+    }
+
+    lista.innerHTML = items.map(n => `
+      <div class="historial-item">
+        <span class="hist-tipo">${n.tipo}</span>
+        <div class="hist-info">
+          <div class="hist-fecha">${n.fecha_hora}</div>
+          ${n.observaciones ? `<div class="hist-obs">${n.observaciones}</div>` : ''}
+          <div class="hist-ip">${n.ip_dispositivo} · ${n.distancia_metros}m del puesto</div>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    lista.innerHTML = '<div class="vacio">Error cargando historial</div>';
+  }
+}
+
+// ── PANEL ADMIN ───────────────────────────────────────────────
+async function mostrarAdmin() {
+  document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+  document.getElementById('admin').classList.add('activa');
+
+  const nombre = localStorage.getItem('adminNombre') || 'Admin';
+  document.getElementById('admin-nombre').textContent = nombre;
+
+  cargarResumen();
+  cargarFiltrosAdmin();
+  cargarNovedades();
+}
+
+async function cargarResumen() {
+  try {
+    const r = await apiFetch('/api/admin/resumen-hoy');
+    document.getElementById('r-total').textContent      = r.total;
+    document.getElementById('r-entradas').textContent   = r.entradas;
+    document.getElementById('r-salidas').textContent    = r.salidas;
+    document.getElementById('r-vigiladores').textContent = r.vigiladores_activos;
+  } catch (e) { console.error(e); }
+}
+
+async function cargarFiltrosAdmin() {
+  try {
+    const [vigs, tipos] = await Promise.all([
+      apiFetch('/api/admin/vigiladores'),
+      apiFetch('/api/tipos-novedad')
+    ]);
+
+    const fv = document.getElementById('f-vigilador');
+    fv.innerHTML = '<option value="">Todos</option>';
+    vigs.forEach(v => {
+      const o = document.createElement('option');
+      o.value = v.id;
+      o.textContent = v.apellido + ', ' + v.nombre + ' (' + v.puesto + ')';
+      fv.appendChild(o);
+    });
+
+    const ft = document.getElementById('f-tipo');
+    ft.innerHTML = '<option value="">Todos los tipos</option>';
+    tipos.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t.id;
+      o.textContent = t.nombre;
+      ft.appendChild(o);
+    });
+  } catch (e) { console.error(e); }
+}
+
+async function cargarNovedades() {
+  const tbody = document.getElementById('tabla-body');
+  tbody.innerHTML = '<tr><td colspan="8" class="loading"><span class="spinner"></span></td></tr>';
+
+  const fecha = document.getElementById('f-fecha').value;
+  const vigId = document.getElementById('f-vigilador').value;
+  const tipoId = document.getElementById('f-tipo').value;
+
+  const params = new URLSearchParams();
+  if (fecha) params.set('fecha', fecha);
+  if (vigId) params.set('vigilador_id', vigId);
+  if (tipoId) params.set('tipo_id', tipoId);
+
+  try {
+    const rows = await apiFetch('/api/admin/novedades?' + params.toString());
+
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="loading">Sin resultados para los filtros seleccionados</td></tr>';
+      return;
+    }
+
+    const badgeClass = tipo => {
+      const m = { 'Entrada': 'entrada', 'Salida': 'salida', 'Ronda': 'ronda', 'Emergencia': 'emergencia' };
+      return 'badge badge-' + (m[tipo] || 'novedad');
+    };
+
+    tbody.innerHTML = rows.map((r, i) => `
+      <tr>
+        <td style="color:var(--texto2); font-size:0.78rem;">${i + 1}</td>
+        <td style="white-space:nowrap; font-size:0.82rem;">${r.fecha_hora}</td>
+        <td>
+          <div style="font-weight:500;">${r.vigilador}</div>
+          <div style="font-size:0.75rem; color:var(--texto2);">@${r.usuario}</div>
+        </td>
+        <td style="font-size:0.82rem;">${r.puesto}</td>
+        <td><span class="${badgeClass(r.tipo_novedad)}">${r.tipo_novedad}</span></td>
+        <td class="ip-mono">${r.ip_dispositivo}</td>
+        <td class="${r.distancia_metros <= 50 ? 'dist-ok' : 'dist-warn'}">${r.distancia_metros}m</td>
+        <td style="font-size:0.82rem; color:var(--texto2); max-width:200px;">${r.observaciones || '—'}</td>
+      </tr>
+    `).join('');
+
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;
+  }
+}
+
+// Enter en login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const tabAdminVisible = document.getElementById('tab-admin').style.display !== 'none';
+    tabAdminVisible ? loginAdmin() : loginVigilador();
+  }
+});
+</script>
+</body>
+</html>
