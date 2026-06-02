@@ -813,7 +813,7 @@ async function loginVigilador() {
   if (!usuario || !password) return mostrarError('error-login', 'Completá usuario y contraseña');
 
   try {
-    const data = await apiFetch('/api/login', {
+    const data = await apiFetch('../../backend', {
       method: 'POST',
       body: JSON.stringify({ usuario, password })
     });
