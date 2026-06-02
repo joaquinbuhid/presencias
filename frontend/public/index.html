@@ -743,7 +743,7 @@
 
 <script>
 // ── Configuracion ─────────────────────────────────────────────
-const API = 'https://jgb.com.ar/backend'; // Vacío = mismo dominio. O poner 'https://jgb.com.ar/backend'
+const API = ''; // Mismo dominio — Express sirve frontend y API
 
 // ── Estado ───────────────────────────────────────────────────
 let token = localStorage.getItem('token') || null;
@@ -813,7 +813,7 @@ async function loginVigilador() {
   if (!usuario || !password) return mostrarError('error-login', 'Completá usuario y contraseña');
 
   try {
-    const data = await apiFetch('../../backend', {
+    const data = await apiFetch('/api/login', {
       method: 'POST',
       body: JSON.stringify({ usuario, password })
     });
